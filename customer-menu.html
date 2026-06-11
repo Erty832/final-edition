@@ -451,40 +451,24 @@ let cart = [];
 
 // ==================== LOAD DATA ====================
 function loadData() {
-  if (db) {
-    // Load from Firebase
-    const restaurantRef = db.ref('restaurant');
-    const categoriesRef = db.ref('categories');
-    const itemsRef = db.ref('items');
-
-    restaurantRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) menuData.restaurant = data;
-      updateRestaurantInfo();
-    });
-
-    categoriesRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) menuData.categories = data;
-      renderCategories();
-    });
-
-    itemsRef.on('value', (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        menuData.items = Object.values(data);
-        renderMenu();
-        hideLoading();
-      }
-    });
+  // Try to load from localStorage first (shared with admin dashboard)
+  const stored = localStorage.getItem('menuPlatformData');
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (parsed.restaurant) menuData.restaurant = parsed.restaurant;
+      if (parsed.categories) menuData.categories = parsed.categories;
+      if (parsed.items) menuData.items = parsed.items;
+    } catch(e) {
+      menuData = JSON.parse(JSON.stringify(demoData));
+    }
   } else {
-    // Demo mode
     menuData = JSON.parse(JSON.stringify(demoData));
-    updateRestaurantInfo();
-    renderCategories();
-    renderMenu();
-    hideLoading();
   }
+  updateRestaurantInfo();
+  renderCategories();
+  renderMenu();
+  hideLoading();
 }
 
 function hideLoading() {

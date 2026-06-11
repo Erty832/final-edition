@@ -221,7 +221,7 @@ body { font-family: 'Cairo', 'Noto Kufi Arabic', sans-serif; background: var(--b
       </div>
       <p style="color:var(--text-muted); margin-bottom:15px;">شارك هذا الرابط مع عملائك ليتمكنوا من تصفح المنيو وإرسال الطلبات</p>
       <div class="preview-link">
-        <input type="text" id="menuLink" value="https://erty832.github.io/final-edition/" readonly>
+        <input type="text" id="menuLink" value="customer-menu.html" readonly>
         <button class="btn btn-secondary" onclick="copyLink()">
           <i class="fas fa-copy"></i> نسخ
         </button>
@@ -548,39 +548,24 @@ let editingCatKey = null;
 
 // ==================== LOAD DATA ====================
 function loadData() {
-  if (db) {
-    // Firebase mode - load from Realtime Database
-    db.ref().on('value', (snapshot) => {
-      const val = snapshot.val();
-      if (val) {
-        data = val;
-      } else {
-        // Initialize with default data
-        data = JSON.parse(JSON.stringify(defaultData));
-        db.ref().set(data);
-      }
-      updateUI();
-      hideLoading();
-    });
-  } else {
-    // LocalStorage mode
-    const stored = localStorage.getItem('menuPlatformData');
-    if (stored) {
-      try { data = JSON.parse(stored); } catch(e) { data = JSON.parse(JSON.stringify(defaultData)); }
-    } else {
-      data = JSON.parse(JSON.stringify(defaultData));
+  // Always use localStorage mode for now (works without Firebase setup)
+  const stored = localStorage.getItem('menuPlatformData');
+  if (stored) {
+    try { 
+      data = JSON.parse(stored); 
+    } catch(e) { 
+      data = JSON.parse(JSON.stringify(defaultData)); 
     }
-    updateUI();
-    hideLoading();
+  } else {
+    data = JSON.parse(JSON.stringify(defaultData));
+    saveData();
   }
+  updateUI();
+  hideLoading();
 }
 
 function saveData() {
-  if (db) {
-    db.ref().set(data);
-  } else {
-    localStorage.setItem('menuPlatformData', JSON.stringify(data));
-  }
+  localStorage.setItem('menuPlatformData', JSON.stringify(data));
 }
 
 function hideLoading() {
